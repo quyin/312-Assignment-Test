@@ -75,7 +75,7 @@ test_case(p3, alu_neg) {
 
   to_bits8(op, 2);
   str_to_bits8(a, "01010111");
-  str_to_bits8(c, "10101000"); // expected
+  str_to_bits8(c, "10101001"); // expected
   alu(op, output, a, b);
   assert_eq8(c, output);
 }
