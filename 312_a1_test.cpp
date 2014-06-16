@@ -22,27 +22,16 @@
 // exit.
 
 #include <iostream>
-#include "simple_test.h"
 #include "basic_functions.h"
 #include "p1.h"
 #include "p2.h"
+#include "simple_test.h"
+#include "test_utils.h"
 
 extern int functionCount;
 
 #define T true
 #define F false
-
-bool bitwise_equal8(bool byte1[8], bool byte2[8]) {
-  for (int i = 0; i < 8; ++i) {
-    if (byte1[i] != byte2[i]) {
-      return false;
-    }
-  }
-  return true;
-}
-
-#define assert_equal8(expected, actual) \
-  assert_true(bitwise_equal8(expected, actual))
 
 test_case(basic_functions, And) {
   assert_eq(F, And(F, F));
@@ -128,9 +117,9 @@ test_case(p2, writeValue) {
   bool b[8] = { F, F, F, F, T, F, F, F };
   bool byte[8] = { F, F, F, F, F, F, F, F };
   writeValue(byte, 4, T);
-  assert_equal8(b, byte);
+  assert_eq8(b, byte);
   writeValue(byte, 4, F);
-  assert_equal8(a, byte);
+  assert_eq8(a, byte);
 }
 
 test_case(p2, mux) {
@@ -138,9 +127,9 @@ test_case(p2, mux) {
   bool b[8] = { T, T, T, T, T, T, T, T };
   bool output[8];
   mux(output, T, a, b);
-  assert_equal8(a, output);
+  assert_eq8(a, output);
   mux(output, F, a, b);
-  assert_equal8(b, output);
+  assert_eq8(b, output);
 }
 
 test_case(p2, addu) {
@@ -150,7 +139,7 @@ test_case(p2, addu) {
 
   bool output[8];
   addu(output, a, b);
-  assert_equal8(s, output);
+  assert_eq8(s, output);
 }
 
 test_case(p2, negate) {
@@ -158,13 +147,13 @@ test_case(p2, negate) {
   bool b1[8] = { T, F, T, F, T, T, T, T };
   bool output1[8]; 
   negate(output1, a1);
-  assert_equal8(b1, output1);
+  assert_eq8(b1, output1);
 
   bool a2[8] = { T, F, F, T, T, T, T, T };
   bool b2[8] = { T, T, T, F, F, F, F, F };
   bool output2[8]; 
   negate(output2, a2);
-  assert_equal8(b2, output2);
+  assert_eq8(b2, output2);
 }
 
 test_case(p2, subu) {
@@ -174,7 +163,7 @@ test_case(p2, subu) {
 
   bool output[8];
   subu(output, a, b);
-  assert_equal8(d, output);
+  assert_eq8(d, output);
 }
 
 test_case(p2, equal) {
@@ -212,7 +201,7 @@ test_case(p2, and8) {
 
   bool output[8];
   and8(output, a, b);
-  assert_equal8(result, output);
+  assert_eq8(result, output);
 }
 
 test_case(p2, or8) {
@@ -222,7 +211,7 @@ test_case(p2, or8) {
 
   bool output[8];
   or8(output, a, b);
-  assert_equal8(result, output);
+  assert_eq8(result, output);
 }
 
 test_case(p2, shiftLeft) {
@@ -231,7 +220,7 @@ test_case(p2, shiftLeft) {
 
   bool output[8];
   shiftLeft(output, a);
-  assert_equal8(b, output);
+  assert_eq8(b, output);
 }
 
 test_case(p2, shiftRight) {
@@ -240,7 +229,7 @@ test_case(p2, shiftRight) {
 
   bool output[8];
   shiftRight(output, a);
-  assert_equal8(b, output);
+  assert_eq8(b, output);
 }
 
 int main(int argc, char** argv) {
