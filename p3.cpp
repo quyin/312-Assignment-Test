@@ -34,13 +34,13 @@ bool* alu(bool op_code[8], bool* output, bool input1[8], bool input2[8]) {
     case 9: c = a >> b; break;
     case 0:
       c = ia + ib;
-      if (c < -128 or c > 127) {
+      if (c < -128 || c > 127) {
         throw "overflow";
       }
       break;
     case 1:
       c = ia - ib;
-      if (c < -128 or c > 127) {
+      if (c < -128 || c > 127) {
         throw "overflow";
       }
       break;
