@@ -81,57 +81,51 @@ test_case(p3, alu_neg) {
 }
 
 test_case(p3, alu_eq) {
-  bool op[8], a[8], b[8], c[8];
+  bool op[8], a[8], b[8];
   bool output[8];
 
   to_bits8(op, 3);
   to_bits8(a, 19);
   to_bits8(b, 19);
-  to_bits8(c, 1); // expected
   alu(op, output, a, b);
-  assert_eq8(c, output);
+  assert_true(output[0]); // test only the least bit
 
   to_bits8(a, 19);
   to_bits8(b, 83);
-  to_bits8(c, 0); // expected
   alu(op, output, a, b);
-  assert_eq8(c, output);
+  assert_false(output[0]);
 }
 
 test_case(p3, alu_lt) {
-  bool op[8], a[8], b[8], c[8];
+  bool op[8], a[8], b[8];
   bool output[8];
 
   to_bits8(op, 4);
   to_bits8(a, 127);
   to_bits8(b, 128);
-  to_bits8(c, 1); // expected
   alu(op, output, a, b);
-  assert_eq8(c, output);
+  assert_true(output[0]);
 
   to_bits8(a, 128);
   to_bits8(b, 127);
-  to_bits8(c, 0); // expected
   alu(op, output, a, b);
-  assert_eq8(c, output);
+  assert_false(output[0]);
 }
 
 test_case(p3, alu_gt) {
-  bool op[8], a[8], b[8], c[8];
+  bool op[8], a[8], b[8];
   bool output[8];
 
   to_bits8(op, 5);
   to_bits8(a, 128);
   to_bits8(b, 127);
-  to_bits8(c, 1); // expected
   alu(op, output, a, b);
-  assert_eq8(c, output);
+  assert_true(output[0]);
 
   to_bits8(a, 127);
   to_bits8(b, 128);
-  to_bits8(c, 0); // expected
   alu(op, output, a, b);
-  assert_eq8(c, output);
+  assert_false(output[0]);
 }
 
 test_case(p3, alu_and) {
