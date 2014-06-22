@@ -77,10 +77,19 @@ bool* getInstructionValue(bool* output, const std::string& instructionName);
 //
 // read and write should never be the same value.
 //
-// You may use if..else.. to choose from calling lw() or sw() in this function.
+// You may use if..else.. in mem() to choose from calling lw() or sw().
 void mem(bool registerNum[8], bool memlocation[16], bool read, bool write);
 void lw(bool registerNum[8], bool memlocation[16]);
 void sw(bool registerNum[8], bool memlocation[16]);
+
+// The following functions are helpers to mem(), lw(), and sw(). They will also
+// make P7 easier.
+//
+// You may use if..else.. in readOrWriteMem() to choose from calling readMem()
+// or writeMem().
+void readOrWriteMem(bool value[8], bool memlocation[8], bool read, bool write);
+void readMem(bool value[8], bool memlocation[16]);
+void writeMem(bool value[8], bool memlocation[16]);
 
 #endif // P6_H
 

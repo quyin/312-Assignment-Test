@@ -269,23 +269,7 @@ test_case(p5, alu_div) {
 }
 
 int main(int argc, char** argv) {
-  run_test_case(p3, alu_addu);
-  run_test_case(p3, alu_subu);
-  run_test_case(p3, alu_neg);
-  run_test_case(p3, alu_eq);
-  run_test_case(p3, alu_lt);
-  run_test_case(p3, alu_gt);
-  run_test_case(p3, alu_and);
-  run_test_case(p3, alu_or);
-  run_test_case(p3, alu_sll);
-  run_test_case(p3, alu_srl);
-  run_test_case(p4, alu_add);
-  run_test_case(p4, alu_sub);
-  run_test_case(p5, alu_multu);
-  run_test_case(p5, alu_mult);
-  run_test_case(p5, alu_divu);
-  run_test_case(p5, alu_div);
-
+  TestCaseRegisterer::run_test_cases();
   std::cout << "Done." << std::endl;
   return 0;
 }
