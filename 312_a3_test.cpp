@@ -36,35 +36,46 @@
 using namespace std;
 
 test_case(p6, read_write_register) {
-  bool r[8], v[8], t[8];
+  initialize();
 
-  to_bits8(r, 8);
-  to_bits8(v, 47);
-  setRegistryValue(r, v);  // $8 = 47
-  getRegistryValue(t, r);  // read $8
-  assert_eq8(v, t);
+  bool rn[8], value[8], result[8];
 
-  to_bits8(r, 0);
-  to_bits8(v, 1);
-  setRegistryValue(r, v);  // $0 = 1
-  getRegistryValue(t, r);  // read $0
-  assert_false(t[0]);      // $0 should always be 0
+  to_bits8(rn, 8);
+  to_bits8(value, 47);
+  setRegistryValue(rn, value);  // $8 = 47
+  getRegistryValue(result, rn); // read $8
+  assert_eq8(value, result);
+
+  to_bits8(rn, 0);
+  to_bits8(value, 1);
+  setRegistryValue(rn, value);  // $0 = 1
+  getRegistryValue(result, rn); // read $0
+  assert_false(result[0]);      // $0 should always be 0
 }
 
 test_case(p6, increment_pc) {
+  initialize();
+
   to_bits8(PC, 100);
   incrementPC();
   assert_eq(104, to_uint8(PC));
 }
 
 test_case(p6, add_pc) {
+  initialize();
+
   bool a[8];
   to_bits8(PC, 104);
-  addPC(to_bits8(a, 16));
+  to_bits8(a, 16);
+  addPC(a);
   assert_eq(120, to_uint8(PC));
 }
 
 test_case(p6, instruction_fetch) {
+  initialize();
+
+  // assuming that the byte order for instructions in memory is:
+  //   { op-code, rout, rin1, rin2 }
   to_bits8(instructionMemory[100], 16); // ADDU
   to_bits8(instructionMemory[101], 4);  // $4
   to_bits8(instructionMemory[102], 8);  // $8
@@ -73,15 +84,18 @@ test_case(p6, instruction_fetch) {
 
   instructionFetch();
 
-  // assuming that the byte layout is: op-code followed by destination register
-  // followed by source register 1 followed by source register 2.
-  assert_eq(16, to_uint8(IR));
-  assert_eq(4, to_uint8(IR + 8));
-  assert_eq(8, to_uint8(IR + 16));
-  assert_eq(9, to_uint8(IR + 24));
+  // assuming that the bit order for IR is big endian, i.e. from higher to
+  // lower:
+  //   { 8b op-code, 8b rout, 8b rin1, 8b rin2 }
+  assert_eq(16, to_uint8(IR + 24));
+  assert_eq(4, to_uint8(IR + 16));
+  assert_eq(8, to_uint8(IR + 8));
+  assert_eq(9, to_uint8(IR));
 }
 
 test_case(p6, load_program) {
+  initialize();
+
   ifstream ifs_test_program("test_program.s");
   initializeInstructionMemory(ifs_test_program);
 
@@ -92,14 +106,17 @@ test_case(p6, load_program) {
   assert_eq(9, to_uint8(instructionMemory[3]));
 
   // SW 4, 10
-  // assuming that for the 16bit immediate operand, the lower byte is stored
-  // before the higher byte.
+  // assuming that for the 16bit immediate operand, the higher byte is stored
+  // before the lower byte (i.e. big endian).
   assert_eq(15, to_uint8(instructionMemory[4]));
   assert_eq(4, to_uint8(instructionMemory[5]));
-  assert_eq(10, to_uint16(instructionMemory[6]));
+  assert_eq(0, to_uint8(instructionMemory[6]));
+  assert_eq(10, to_uint8(instructionMemory[7]));
 }
 
 test_case(p6, get_instruction_name) {
+  initialize();
+
   bool op_code[8];
   getInstructionValue(op_code, "SUBU");
   assert_eq(17, to_uint8(op_code));
@@ -108,23 +125,26 @@ test_case(p6, get_instruction_name) {
 }
 
 test_case(p6, parse_instruction) {
+  initialize();
+
   bool op_code[8], rd[8], rs1[8], rs2[8], imm[16];
 
-  // ADDU 4, 8, 9  ==>  16, 4, 8, 9
-  to_bits8(IR, 16);
-  to_bits8(IR + 8, 4);
-  to_bits8(IR + 16, 8);
-  to_bits8(IR + 24, 9);
+  // ADDU 4, 8, 9  ==>  16, 4, 8, 9, big endian
+  to_bits8(IR + 24, 16);
+  to_bits8(IR + 16, 4);
+  to_bits8(IR + 8, 8);
+  to_bits8(IR, 9);
   parseInstructionInIR(op_code, rd, rs1, rs2, imm);
   assert_eq(16, to_uint8(op_code));
   assert_eq(4, to_uint8(rd));
   assert_eq(8, to_uint8(rs1));
   assert_eq(9, to_uint8(rs2));
 
-  // SW 4, 10  ==>  15, 4, 0, 10 
-  to_bits8(IR, 15);
-  to_bits8(IR + 8, 4);
-  to_bits16(IR + 16, 10);
+  // SW 4, 10  ==>  15, 4, 0, 10, big endian
+  to_bits8(IR + 24, 15);
+  to_bits8(IR + 16, 4);
+  to_bits8(IR + 8, 0);
+  to_bits8(IR, 10);
   parseInstructionInIR(op_code, rd, rs1, rs2, imm);
   assert_eq(15, to_uint8(op_code));
   assert_eq(4, to_uint8(rd));
@@ -132,27 +152,33 @@ test_case(p6, parse_instruction) {
 }
 
 test_case(p6, read_write_data_memory) {
-  bool r1[8], r2[8], mem_addr[8];
+  initialize();
+
+  bool r1[8], r2[8], mem_addr[16];
 
   to_bits8(r1, 3);
   to_bits8(registry[3], 19);      // $3 = 19
-  to_bits8(mem_addr, 8);
-  mem(r1, mem_addr, false, true); // save $3 (= 19) to mem[8]
+  to_bits16(mem_addr, 7);
+  mem(r1, mem_addr, false, true); // save $3 (= 19) to mem[7]
 
   to_bits8(r2, 4);
-  mem(r2, mem_addr, true, false); // load mem[8] to $4
-  assert_eq(19, to_uint8(r2));    // check if $4 == 19
+  mem(r2, mem_addr, true, false); // load mem[7] to $4
+  assert_eq(19, to_int8(registry[4]));    // check if $4 == 19
 }
 
 test_case(p7, run_program) {
+  initialize();
+
   // LI 4, 11
-  to_bits8(instructionMemory[0], 12);
+  to_bits8(instructionMemory[0], 30);
   to_bits8(instructionMemory[1], 4);
-  to_bits16(instructionMemory[2], 11);
+  to_bits8(instructionMemory[2], 0);
+  to_bits8(instructionMemory[3], 11);
   // LI 5, 13
-  to_bits8(instructionMemory[4], 12);
+  to_bits8(instructionMemory[4], 30);
   to_bits8(instructionMemory[5], 5);
-  to_bits16(instructionMemory[6], 13);
+  to_bits8(instructionMemory[6], 0);
+  to_bits8(instructionMemory[7], 13);
   // ADDU 6, 4, 5
   to_bits8(instructionMemory[8], 16);
   to_bits8(instructionMemory[9], 6);
@@ -161,7 +187,8 @@ test_case(p7, run_program) {
   // SW 6, 10
   to_bits8(instructionMemory[12], 15);
   to_bits8(instructionMemory[13], 6);
-  to_bits16(instructionMemory[14], 10);
+  to_bits8(instructionMemory[14], 0);
+  to_bits8(instructionMemory[15], 10);
   
   to_bits8(PC, 0);
   tick();

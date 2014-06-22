@@ -76,24 +76,40 @@ void assert_bitwise_eq_helper(bool* v1,
 
 
 
-class TestCaseRegisterer {
-  private:
-    static std::vector<void (*)()> test_cases;
+class TestCase {
   public:
-    TestCaseRegisterer(void (*t)()) {
+    TestCase(const char* name, void (*fn)()): _name(name), _fn(fn) {}
+    const char* name() { return _name; }
+    void run() { _fn(); }
+
+  private:
+    const char* _name;
+    void (*_fn)();
+};
+
+class TestCaseRegisterer {
+  public:
+    TestCaseRegisterer(const char* name, void (*fn)()) {
+      TestCase t(name, fn);
       test_cases.push_back(t);
     }
 
     static void run_test_cases() {
       for (int i = 0; i < test_cases.size(); ++i) {
-        test_cases[i]();
+        std::cout << "Running case: " << test_cases[i].name() << "...";
+        test_cases[i].run();
+        std::cout << " Done." << std::endl;
       }
     }
+
+  private:
+    static std::vector<TestCase> test_cases;
 };
 
 #define test_case(suite_name, case_name) \
   void tc_ ## suite_name ## _ ## case_name(); \
   TestCaseRegisterer tcr_ ## suite_name ## _ ## case_name( \
+      #suite_name "_" #case_name, \
       tc_ ## suite_name ## _ ## case_name); \
   void tc_ ## suite_name ## _ ## case_name()
 
