@@ -85,7 +85,6 @@ void sw(bool registerNum[8], bool memlocation[16]);
 // The following functions are helpers to mem(), lw(), and sw(). They will also
 // make P7 easier.
 //
-//
 // You may use if..else.. in readOrWriteMem() to choose from calling readMem()
 // or writeMem().
 void readOrWriteMem(bool value[8], bool memlocation[8], bool read, bool write);
