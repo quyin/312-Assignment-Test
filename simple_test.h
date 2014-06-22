@@ -6,6 +6,7 @@
 #ifndef SIMPLE_TEST_H
 #define SIMPLE_TEST_H
 
+#include <vector>
 #include <iostream>
 #include "test_utils.h"
 
@@ -73,11 +74,28 @@ void assert_bitwise_eq_helper(bool* v1,
   } \
   while (false);
 
-#define test_case(suite_name, case_name) \
-  void test_case_ ## suite_name ## _ ## case_name()
 
-#define run_test_case(suite_name, case_name) \
-  test_case_ ## suite_name ## _ ## case_name()
+
+class TestCaseRegisterer {
+  private:
+    static std::vector<void (*)()> test_cases;
+  public:
+    TestCaseRegisterer(void (*t)()) {
+      test_cases.push_back(t);
+    }
+
+    static void run_test_cases() {
+      for (int i = 0; i < test_cases.size(); ++i) {
+        test_cases[i]();
+      }
+    }
+};
+
+#define test_case(suite_name, case_name) \
+  void test_case_ ## suite_name ## _ ## case_name(); \
+  TestCaseRegisterer(test_case_ ## suite_name ## _ ## case_name) \
+    test_case_ ## suite_name ## _ ## case_name ## _registerer; \
+  void test_case_ ## suite_name ## _ ## case_name()
 
 #endif // SIMPLE_TEST_H
 
