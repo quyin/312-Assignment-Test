@@ -9,7 +9,7 @@
 #ifndef P6_H
 #define P6_H
 
-#include <iostream>
+#include <fstream>
 #include <string>
 
 // Registry, memory, and counters.
@@ -35,7 +35,7 @@ int toDecimal(bool registerNum[8]);
 // PC = PC + 4.
 void incrementPC();
 // PC = PC + addressOffset; addressOffset must be multiple of 4.
-void addPC(bool[8] addressOffset);
+void addPC(bool addressOffset[8]);
 
 // Fetch 32 bits from instructionMemory[PC] to IR.
 void instructionFetch();

@@ -92,10 +92,10 @@ class TestCaseRegisterer {
 };
 
 #define test_case(suite_name, case_name) \
-  void test_case_ ## suite_name ## _ ## case_name(); \
-  TestCaseRegisterer(test_case_ ## suite_name ## _ ## case_name) \
-    test_case_ ## suite_name ## _ ## case_name ## _registerer; \
-  void test_case_ ## suite_name ## _ ## case_name()
+  void tc_ ## suite_name ## _ ## case_name(); \
+  TestCaseRegisterer tcr_ ## suite_name ## _ ## case_name( \
+      tc_ ## suite_name ## _ ## case_name); \
+  void tc_ ## suite_name ## _ ## case_name()
 
 #endif // SIMPLE_TEST_H
 

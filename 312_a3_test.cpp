@@ -58,8 +58,9 @@ test_case(p6, increment_pc) {
 }
 
 test_case(p6, add_pc) {
+  bool a[8];
   to_bits8(PC, 104);
-  addPC(16);
+  addPC(to_bits8(a, 16));
   assert_eq(120, to_uint8(PC));
 }
 
