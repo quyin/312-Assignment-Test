@@ -46,11 +46,11 @@ void tick() {
 
   // WB
   if (is_li) {
-    copy_n(imm, 8, final_result);
+    copy(imm, imm + 8, final_result);
   } else if (is_alu) {
-    copy_n(alu_result, 8, final_result);
+    copy(alu_result, alu_result + 8, final_result);
   } else {
-    copy_n(rd_value, 8, final_result);
+    copy(rd_value, rd_value + 8, final_result);
   }
   setRegistryValue(rd, final_result);
 

@@ -34,14 +34,14 @@ bool* getRegistryValue(bool* output, bool registerNum[8]) {
   if (rn == 0) {
     fill_n(output, 8, false);
   }
-  copy_n(registry[rn], 8, output);
+  copy(registry[rn], registry[rn]+8, output);
   return output;
 }
 
 void setRegistryValue(bool registerNum[8], bool value[8]) {
   int rn = to_uint8(registerNum);
   if (rn != 0) {
-    copy_n(value, 8, registry[rn]);
+    copy(value, value + 8, registry[rn]);
   }
 }
 
@@ -64,10 +64,10 @@ void addPC(bool addressOffset[8]) {
 
 void instructionFetch() {
   int pc = to_uint8(PC);
-  copy_n(instructionMemory[pc], 8, IR+24);
-  copy_n(instructionMemory[pc+1], 8, IR+16);
-  copy_n(instructionMemory[pc+2], 8, IR+8);
-  copy_n(instructionMemory[pc+3], 8, IR);
+  copy(instructionMemory[pc], instructionMemory[pc]+8, IR+24);
+  copy(instructionMemory[pc+1], instructionMemory[pc+1]+8, IR+16);
+  copy(instructionMemory[pc+2], instructionMemory[pc+2]+8, IR+8);
+  copy(instructionMemory[pc+3], instructionMemory[pc+3]+8, IR);
 }
 
 void parseInstructionInIR(bool* name,
@@ -75,17 +75,17 @@ void parseInstructionInIR(bool* name,
                           bool* reg_in1,
                           bool* reg_in2,
                           bool* imm16) {
-  copy_n(IR+24, 8, name);
+  copy(IR + 24, IR + 32, name);
   int op = to_uint8(name);
   if (op == 14 || op == 15 || op == 30) {
     // I-format
-    copy_n(IR + 16, 8, reg_out);
-    copy_n(IR, 16, imm16);
+    copy(IR + 16, IR + 24, reg_out);
+	 	copy(IR, IR + 16, imm16);
   } else {
     // R-format
-    copy_n(IR + 16, 8, reg_out);
-    copy_n(IR + 8, 8, reg_in1);
-    copy_n(IR, 8, reg_in2);
+    copy(IR + 16, IR + 24, reg_out);
+    copy(IR + 8, IR + 16, reg_in1);
+    copy(IR, IR + 8, reg_in2);
   }
 }
 
@@ -167,10 +167,10 @@ void readOrWriteMem(bool value[8], bool memlocation[8], bool read, bool write) {
 
 void readMem(bool value[8], bool memlocation[16]) {
   int addr = to_uint16(memlocation);
-  copy_n(dataMemory[addr], 8, value);
+  copy(dataMemory[addr], dataMemory[addr] + 8, value);
 }
 
 void writeMem(bool value[8], bool memlocation[16]) {
   int addr = to_uint16(memlocation);
-  copy_n(value, 8, dataMemory[addr]);
+  copy(value, value + 8, dataMemory[addr]);
 }
