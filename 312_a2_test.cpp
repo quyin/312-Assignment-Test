@@ -263,7 +263,7 @@ test_case(p5, alu_div) {
   to_bits8(op, 13);
   to_bits8(a, -113);
   to_bits8(b, 47);
-  to_bits16(c, ((-19) << 8) + (-2)); // quotient = -2, remainder = -19
+  to_bits16(c, ((-19) << 8) + (0xff & -2)); // quotient = -2, remainder = -19
   alu(op, output, a, b);
   assert_eq16(c, output);
 }
